@@ -1,0 +1,37 @@
+func UpVoteCrypto(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var UpVoteValue model.UpVote
+	for _, item := range cryptos {
+		if item.ID == params["cryptoID"] {
+			_ = json.NewDecoder(r.Body).Decode(&UpVoteValue)
+			if UpVoteValue.Upvote == "0" {
+				err := db.DecrementVoteValue(params["cryptoID"])
+				if err != nil {
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					return
+				}
+			}
+			if UpVoteValue.Upvote == "1" {
+				err := db.UpdateVoteValue(params["cryptoID"])
+				if err != nil {
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					return
+				}
+			}
+			if UpVoteValue.Upvote != "0" && UpVoteValue.Upvote != "1" {
+				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				fmt.Println("[upvote] Error: ", err)
+				return
+			}
+		}
+	}
+	jsonByte, err := json.Marshal(cryptos)
+	if err != nil {
+		fmt.Println("[upvote] Error json Marshal: ", err)
+		return
+	}
+
+	w.Write(jsonByte)
+
+}
