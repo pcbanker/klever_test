@@ -15,6 +15,30 @@ So, are you ready to vote?
 
 <h1 align="center">Operation</h1>
 
+```
+├── db
+│   ├── db.go //Contains the functions making connection to the database
+│   └── db_test.go //Contains connection test functions
+├── go.mod
+├── go.sum
+├── handlers
+│   ├── vote.go //Contains the functions that are used to list the cryptos and to run the Upvote system
+│   └── vote_test.go //Contains the functions that test whether the collection of cryptos is being done correctly and whether the upvote system is working correctly
+├── html
+│   └── index.html //Contains web page settings
+├── imgs
+│   ├── doge.jpeg
+│   ├── eth.jpeg
+│   ├── images.jpeg
+│   ├── klv.jpeg
+│   ├── trx.jpeg
+│   └── xrp.jpeg
+├── main.go //Contains web page endpoints
+├── model
+│   └── crypto.go //Contains the structs to collect cryptocurrency and upvote information
+└── price
+    └── price.go //Contains the function that collects the crypto price
+```
 
 In the "db" folder, we have functions in the db file that make a connection with the Mongo database, connect to the collection where the API collects data for cryptos, increment votes for the desired crypto, and decrement votes for the desired crypto. We also have a unit test file that tests the connection to my database and the collection of information from the crypto collection.
 
