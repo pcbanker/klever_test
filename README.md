@@ -13,7 +13,7 @@ On the other hand, the Downvote functionality decreases the vote count and also 
 <p> </p>
 So, are you ready to vote?
 
-<h1 align="center">Operacion</h1>
+<h1 align="center">Operation</h1>
 
 
 In the "db" folder, we have functions in the db file that make a connection with the Mongo database, connect to the collection where the API collects data for cryptos, increment votes for the desired crypto, and decrement votes for the desired crypto. We also have a unit test file that tests the connection to my database and the collection of information from the crypto collection.
