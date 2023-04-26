@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -10,7 +11,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -20,136 +20,66 @@ var (
 	clientOnce     sync.Once
 )
 
+// This function is responsible for getting a connection to the MongoDB server and returning it in the form of a pointer (*mongo.Client) so that it can be used in other parts of the code.
 func GetConnection() *mongo.Client {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	mongoURI := os.Getenv("MONGO_URI")
 
+	mongoURI := os.Getenv("MONGO_URI") // mongoURI gets the value from the environment variable and stores it in the variable
+
+	//Executes an anonymous function only once, using the global variable "clientOnce"
 	clientOnce.Do(func() {
-		clientOptions := options.Client().ApplyURI(mongoURI)
-		// Connect to MongoDB
-		client, err := mongo.Connect(context.Background(), clientOptions)
+		clientOptions := options.Client().ApplyURI(mongoURI) //Creates a client options object for MongoDB using the value of the "mongoURI" variable.
+
+		client, err := mongo.Connect(context.Background(), clientOptions) //Connects to MongoDB server using defined client options
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err) //If an error occurred, the function returns it.
 		}
 
-		// Check the connection
-		err = client.Ping(context.Background(), nil)
+		err = client.Ping(context.Background(), nil) //Tests the client's connection to the server
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err) //If an error occurred, the function returns it.
 		}
 
-		clientInstance = client
+		clientInstance = client //Sets the global variable "clientInstance" to the client object.
 	})
 
 	return clientInstance
+
 }
 
-// GetCollection connects to the database and returns the indicated collection
+// This function returns a pointer to a MongoDB collection specified as an argument.
+// GetCollection takes a string collection as a parameter and returns a pointer to mongo.Collection.
 func GetCollection(collection string) *mongo.Collection {
-	db := GetConnection()
-	mongoDbName := os.Getenv("MONGO_DBNAME")
-	return db.Database(mongoDbName).Collection(collection)
+
+	db := GetConnection() //db gets the GetConnection function to get a MongoDB database connection
+
+	mongoDbName := os.Getenv("MONGO_DBNAME") //mongoDbName get database name value from environment variable
+
+	return db.Database(mongoDbName).Collection(collection) // Returns the specified collection using the database name and collection name
 }
 
-// FindByUserId searches for a user based on its Id
-func FindByUserId(id string) (bson.M, error) {
-	userColl := GetCollection("Client")
-	var result bson.M
-	err := userColl.FindOne(context.Background(), bson.M{"UserId": id}).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// CreateUser adds the generated Id to the Client database
-func CreateUser(id string) error {
-	userColl := GetCollection("Client")
-	_, err := userColl.InsertOne(context.Background(), bson.M{"UserId": id})
-	if err != nil {
-		return err
-	}
-	return nil
-
-}
-
-// FindByCryptoId searches for a cryptoId from the indicated Id
-func FindByCryptoId(id string) (bson.M, error) {
-	cryptoColl := GetCollection("Crypto")
-	var result bson.M
-	err := cryptoColl.FindOne(context.Background(), bson.M{"_id": id}).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// FindVoteCrypto searches the user's database if it stores the crypto id
-func FindVoteCrypto(idUser string, cryptoId string) (bson.M, error) {
-	userColl := GetCollection("Client")
-	_, err := FindByUserId(idUser)
-	if err != nil {
-		return nil, err
-	}
-	var result bson.M
-	err = userColl.FindOne(context.Background(), bson.M{"cryptoId": cryptoId}).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-// UpdateVoteValue updates, through the crypto id, the number of votes in the crypto database
+// This function increments the value of the "vote" field from one of the "Crypto" collection in the database.
+// UpdateVoteValue takes a cryptoId string as a parameter
 func UpdateVoteValue(cryptoId string) error {
-	cryptoColl := GetCollection("Crypto")
-	_, err := cryptoColl.UpdateOne(context.Background(), bson.M{"_id": cryptoId}, bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "vote", Value: 1}}}}, options.Update().SetUpsert(true))
+
+	cryptoColl := GetCollection("Crypto") //cryptoColl gets a connection to the database "Crypto" collection.
+
+	_, err := cryptoColl.UpdateOne(context.Background(), bson.M{"_id": cryptoId}, bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "vote", Value: 1}}}}) //UpdateOne serves to update a document in the "Crypto" collection. First, the context of the operation is passed, as a second parameter, a filter that searches for a crypto with an id equal to cryptoId, and as a third parameter, an operator that increments the value of the "vote" field by 1.
 	if err != nil {
+		fmt.Println(err) // If there are any errors, the function returns them.
 		return err
 	}
 	return nil
 }
 
-// DecrementVoteValue removes, through the crypto id, a vote from the crypto database
+// This function decrements the value of the "vote" field from one of the "Crypto" collection in the database.
+// DecrementVoteValue takes a cryptoId string as a parameter
 func DecrementVoteValue(cryptoId string) error {
-	cryptoColl := GetCollection("Crypto")
-	_, err := cryptoColl.UpdateOne(context.Background(), bson.M{"_id": cryptoId}, bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "vote", Value: -1}}}})
+
+	cryptoColl := GetCollection("Crypto") //cryptoColl gets a connection to the database "Crypto" collection.
+
+	_, err := cryptoColl.UpdateOne(context.Background(), bson.M{"_id": cryptoId}, bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "vote", Value: -1}}}}) //UpdateOne serves to update a document in the "Crypto" collection. First, the context of the operation is passed, as a second parameter, a filter that searches for a crypto with the id equal to cryptoId, and as a third parameter, an operator that increments the value of the "vote" field by -1, that is, decreases by 1.
 	if err != nil {
-		return err
+		return err // If there are any errors, the function returns them.
 	}
 	return nil
-}
-
-// UpdateVoteValueUser updates, through the crypto id, the number of votes in the user's database
-func UpdateVoteValueUser(userId string, cryptoId string) (bson.M, error) {
-	userColl := GetCollection("Client")
-	var result bson.M
-	err := userColl.FindOne(context.Background(), bson.M{"UserId": userId}).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-	_, err = userColl.UpdateOne(context.Background(), bson.M{"UserId": userId}, bson.D{primitive.E{Key: "$inc", Value: bson.D{primitive.E{Key: "vote", Value: 1}, primitive.E{Key: "cryptoId", Value: cryptoId}}}}, options.Update().SetUpsert(true))
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
-}
-
-// DecrementVoteValueUser withdraws, through the crypto id, a vote from the user's database
-func DecrementVoteValueUser(userId string, cryptoId string) (bson.M, error) {
-	userColl := GetCollection("Client")
-	var result bson.M
-	err := userColl.FindOne(context.Background(), bson.M{"UserId": userId}).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-	_, err = userColl.UpdateOne(context.Background(), bson.M{"UserId": userId}, bson.D{primitive.E{Key: "$dec", Value: bson.D{primitive.E{Key: "vote", Value: 1}, primitive.E{Key: "cryptoId", Value: cryptoId}}}})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
 }

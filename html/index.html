@@ -5,27 +5,192 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryptoCurrency</title>
+    <style>
+        body{
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #buttons{
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        .coin{
+            display: inline-block;
+            margin-right: 20px;
+            padding: 5px;
+            font-size: 15px;
+            background:linear-gradient(45deg, black 10.3%, #aa33b5e8 100% ) ;
+            color: aliceblue;
+            border-radius: 10px;
+        }
+        
+        .upvote{
+            margin-left: 70px;
+            margin-top: 30px;
+            width:  220px;
+        }
+
+        img{
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            margin-left:40px;
+        }
+
+        h2{
+            text-align: center;
+        }
+
+        .votes{
+            margin-top: 60px;
+            margin-bottom: 60px;
+            text-align: end;
+
+        }
+
+        #cryptos{
+            margin: 20px;
+            margin-left: 130px;
+            padding: 10px;
+            width:100px;
+            cursor: pointer;
+            font-size: 15px;
+            background:linear-gradient(45deg, black 10.3%, #aa33b5e8 100% ) ;
+            color: aliceblue;
+            border-radius: 10px;
+
+        
+        }
+
+        a{
+            text-decoration: none;
+        }
+ 
+    </style>
 </head>
-<body><form>
-        <div id="buttons">
-            <div>
-                <p id="bitcoin">{{.Price}}</p>
-                <button id="1" name="bitcoin" class="coin"  type="submit">Bitcoin</button>
+<body >
+    <div id="buttons">
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Bitcoin</h2>
+                    <img src="/imgs/images.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="1" name="bitcoin" onclick="location.href='/upvote?cryptoId=1'" class="coin" >Upvote</button>
+                    <button id="1.5" name="bitcoin" onclick="location.href='/upvote?cryptoId=1'" class="coin"  >Downvote</button>
+                </div>
             </div>
-            <div>
-                <p id="ethereum">{{.Price}}</p>
-                <button id="2" name="ethereum" class="coin"  type="submit">Ethereum</button>
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Ethereum</h2>
+                    <img src="/imgs/eth.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="2" name="ethereum" onclick="location.href='/upvote?cryptoId=2'" class="coin"  >Upvote</button>
+                    <button id="2.5" name="ethereum" onclick="location.href='/upvote?cryptoId=2'" class="coin"  >Downvote</button>
+                </div>
             </div>
-            <div>
-                <p id="klv">{{.Price}}</p>
-                <button id="3" name="klv" class="coin"  type="submit">KLV</button>
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Klever</h2>
+                    <img src="/imgs/klv.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="3" name="klv" class="coin" onclick="location.href='/upvote?cryptoId=3'"  >Upvote</button>
+                    <button id="3.5" name="klv" class="coin" onclick="location.href='/upvote?cryptoId=3'"  >Downvote</button>
+                </div>
             </div>
-            <div>
-                <p id="trx">{{.Price}}</p>
-                <button id="4" name="trx" class="coin"  type="submit">TRX</button>
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Tron</h2>
+                    <img src="/imgs/trx.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="4" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=4'" >Upvote</button>
+                    <button id="4.5" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=4'">Downvote</button>
+                </div>
             </div>
-        </div>
-</form>
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Dogecoin</h2>
+                    <img src="/imgs/doge.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="5" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=5'" >Upvote</button>
+                    <button id="5.5" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=5'">Dowvote</button>
+                </div>
+            </div>
+            <div class="upvote">
+                <div class="imgs">
+                    <h2>Ripple</h2>
+                    <img src="/imgs/xrp.jpeg" alt="">
+                </div>
+                <div class="votes">
+                    <button id="6" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=6'" >Upvote</button>
+                    <button id="6.5" name="trx" class="coin" onclick="location.href='/upvote?cryptoId=6'">Downvote</button>
+                </div>
+            </div>
+            <a href="http://localhost:8080/cryptos"><button id="cryptos">List of Cryptos</button></a>
+    </div>
+
+  
+
+<script>
+    document.getElementById("1").addEventListener("click", function(){
+        sendVote("up", "1");
+    });
+    document.getElementById("1.5").addEventListener("click", function(){
+        sendVote("down", "1");
+    });
+    document.getElementById("2").addEventListener("click", function(){
+        sendVote("up", "2");
+    });
+    document.getElementById("2.5").addEventListener("click", function(){
+        sendVote("down", "2");
+    });
+    document.getElementById("3").addEventListener("click", function(){
+        sendVote("up", "3");
+    });
+    document.getElementById("3.5").addEventListener("click", function(){
+        sendVote("down", "3");
+    });
+    document.getElementById("4").addEventListener("click", function(){
+        sendVote("up", "4");
+    });
+    document.getElementById("4.5").addEventListener("click", function(){
+        sendVote("down", "4");
+    });
+    document.getElementById("5").addEventListener("click", function(){
+        sendVote("up", "5");
+    });
+    document.getElementById("5.5").addEventListener("click", function(){
+        sendVote("down", "5");
+    });
+    document.getElementById("6").addEventListener("click", function(){
+        sendVote("up", "6");
+    });
+    document.getElementById("6.5").addEventListener("click", function(){
+        sendVote("down", "6");
+    });
+
+function sendVote(vote , id){
+        
+if (vote !== "up" && vote !== "down") { // verifica se o valor de vote é diferente de 0 e 1
+        console.log("Invalid value to vote", vote);
+        return;
+    }
+
+  var dados = { upvote: vote};
+  var id = id;
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/upvote?cryptoId="+id);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8" );
+  xhr.send(JSON.stringify(dados));
+        
+}
+
+</script>
 
 </body>
 </html>
